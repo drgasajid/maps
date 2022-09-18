@@ -1,0 +1,59 @@
+---
+title: "Distribution of meta-analysis published acrossed the world in Veterinary Sciences"
+author: "drgasajid"
+date: "9/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Import
+
+Data import for which map will be ploted:
+
+```{r}
+library(readxl)
+df <- read_excel("vetmeta_country.xlsx") #our data for country map
+View(df)
+summary(df)
+```
+
+## Main packages used for map plot
+
+Following packages were used to plot the distribution of numbers:
+
+```{r}
+library("dplyr")
+theme_set(theme_bw())
+library("sf")
+library("rnaturalearth")
+library("rnaturalearthdata")
+```
+## Calling world map data
+
+calling world map data in sf:
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+## Mixing both datasets
+```{r}
+wdf <- left_join(world, df, by="name")
+str(wdf)
+```
+## Plotting map
+```{r}
+map <- ggplot(data = wdf) +
+  geom_sf(color = "grey50", fill = "lightgreen") + # base plain map
+  theme(panel.grid.major = element_line(color = gray(0.5),
+                                        linetype = "dashed", size = 0.5), #grid lines
+        panel.background = element_rect(fill = "aliceblue")) +
+  geom_sf_label(aes(label = numbers), label.padding = unit(1, "mm"),
+                label.size  = 0.2, alpha = 0.5) +  # adding own numbers on countries
+  xlab("Longitude") + ylab("Latitude") + ggtitle("Meta-Analysis studies published across the world (2002-2022")
+                      
+map
+```
+
